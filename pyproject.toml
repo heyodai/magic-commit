@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "magic-commit"
+version = "0.1.0"
+description = "LLM to write git commit messages"
+authors = ["Odai Athamneh <heyodai@gmail.com>"]
+readme = "README.md"
+packages = [{include = "magic_commit"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
