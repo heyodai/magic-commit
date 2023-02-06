@@ -4,11 +4,16 @@ version = "0.1.0"
 description = "LLM to write git commit messages"
 authors = ["Odai Athamneh <heyodai@gmail.com>"]
 readme = "README.md"
-packages = [{include = "magic_commit"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+boto3 = "^1.26.65"
 
+[tool.poetry.scripts]
+upload = "src.aws:upload"
+download = "src.aws:download"
+git-dff = "src.acquire_git_diff:main"
 
 [build-system]
 requires = ["poetry-core"]
