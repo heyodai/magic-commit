@@ -1,0 +1,62 @@
+"""
+We found an excellent GitHub commit dataset on Kaggle. However, it doesn't list what each commit actually changed.
+
+Fortunately, it looks like this can be done via the GitHub API.
+
+@see https://github.com/heyodai/magic-commit/issues/1
+"""
+import pandas as pd
+import requests
+from rich import print
+
+"""
+The dataset from Kaggle is available here: https://www.kaggle.com/datasets/dhruvildave/github-commit-messages-dataset
+
+The dataset is a CSV file with the following columns:
+- commit: The commit hash
+- author: The author of the commit
+- date: The date of the commit
+- message: The commit message
+- repo: The repository name
+"""
+df = pd.read_csv('data/full.csv')
+length = len(df)
+
+"""
+Now, let's loop through each commit and get the diff for it.
+
+The GitHub API format is as follows:
+
+    https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}
+"""
+for index, row in df.iterrows():
+    print("""
+    Processing {}/{} rows
+    commit {} for repo {}
+    """.format(index + 1, length, row['commit'], row['repo']), end="\r")
+
+    url = 'https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}'.format(
+        owner=row['repo'].split('/')[0],
+        repo=row['repo'].split('/')[1],
+        commit_sha=row['commit']
+    )
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        print('Error: {}'.format(response.status_code))
+        break
+
+    df.at[index, 'additions'] = 0
+    df.at[index, 'deletions'] = 0
+    df.at[index, 'files_changed'] = 0
+    df.at[index, 'patch'] = ''
+
+    for file in response.json()['files']:
+        df.at[index, 'additions'] = df.at[index, 'additions'] + file['additions']
+        df.at[index, 'deletions'] = df.at[index, 'deletions'] + file['deletions']
+        df.at[index, 'files_changed'] = df.at[index, 'files_changed'] + file['changes']
+
+        if 'patch' in file:
+            df.at[index, 'patch'] = df.at[index, 'patch'] + file['patch']
+
+df.to_csv('data/full_with_diff.csv', index=False)
