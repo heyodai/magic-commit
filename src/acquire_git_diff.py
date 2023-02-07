@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 import logging
 import time
+import pickle
 from rich import print
 from dotenv import dotenv_values
 
@@ -43,6 +44,16 @@ The GitHub API format is as follows:
     https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}
 """
 for index, row in df.iterrows():
+    # Check if current_row.pickle exists
+    # If it does, start from there
+    try:
+        with open('data/current_row.pickle', 'rb') as f:
+            current_row = pickle.load(f)
+            if current_row > index:
+                continue
+    except FileNotFoundError:
+        current_row = 0
+
     # Print the progress
     message = """
     Processing {}/{} rows
@@ -89,4 +100,21 @@ for index, row in df.iterrows():
         if 'patch' in file:
             df.at[index, 'patch'] = df.at[index, 'patch'] + file['patch']
 
+    # Increment and then pickle the current_row variable
+    current_row = index
+    with open('data/current_row.pickle', 'wb') as f:
+        pickle.dump(current_row, f)
+
 df.to_csv('data/full_with_diff.csv', index=False)
+
+def main():
+    pass
+
+def extract_raw_to_db():
+    pass
+
+def load_db():
+    pass
+
+def save_db():
+    pass
