@@ -11,8 +11,11 @@ import logging
 import time
 import pickle
 import sqlite3
+import os
 from rich import print
-# from dotenv import dotenv_values
+from dotenv import load_dotenv
+
+GITHUB_API_TOKEN = os.environ['GITHUB_API_TOKEN']
 
 def main():
     # Set up logging
@@ -77,12 +80,17 @@ def main():
 
         # Get the diff
         try:
-            r = requests.get('https://api.github.com/repos/{}/commits/{}'.format(repo, commit))
+            authorization = f'token {GITHUB_API_TOKEN}'
+            headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "Authorization" : authorization,
+            }
+            r = requests.get('https://api.github.com/repos/{}/commits/{}'.format(repo, commit), headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as err:
             log.error('Error getting diff for commit {}: {}'.format(commit, err))
             print('Error getting diff for commit {}: {}'.format(commit, err))
-            continue
+            exit(1)
 
         additions = 0
         deletions = 0
