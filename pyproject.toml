@@ -9,11 +9,14 @@ packages = [{include = "src"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 boto3 = "^1.26.65"
+pandas = "^1.5.3"
+requests = "^2.28.2"
+rich = "^13.3.1"
 
 [tool.poetry.scripts]
 upload = "src.aws:upload"
 download = "src.aws:download"
-git-dff = "src.acquire_git_diff:main"
+git-diff = "src.acquire_git_diff:main"
 
 [build-system]
 requires = ["poetry-core"]
