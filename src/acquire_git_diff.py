@@ -121,7 +121,7 @@ def main():
         time.sleep(1)
 
         # If we've reached the end of the dataset, write database to csv file
-        if True: #index == length - 1:
+        if index == length - 1:
             log.info('Writing database to csv file')
             print('Writing database to csv file')
             df = pd.read_sql_query("SELECT * FROM raw", con)
