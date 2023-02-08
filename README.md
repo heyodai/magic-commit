@@ -24,6 +24,10 @@ The goal of Magic Commit is to automatically write your commit messages for you.
 - `poetry run upload` - Upload contents of `/data` to AWS
 - `poetry run download` - Download contents of `/data` from AWS
 
+### Data Sources
+
+- `full.csv` - [Full dataset](https://www.kaggle.com/datasets/dhruvildave/github-commit-messages-dataset) of commit messages
+
 ## Contributing
 
 ¯\\_(ツ)_/¯
