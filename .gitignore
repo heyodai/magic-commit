@@ -1,11 +1,6 @@
 .DS_Store
-*/.DS_Store
-
 .env
-*/.env
-
-__pycache__
+env
 */__pycache__
-
 logs
 data
