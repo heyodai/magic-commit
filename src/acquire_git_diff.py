@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS commits (
 """)
 cur.execute("""
 CREATE TABLE IF NOT EXISTS diff (
+    rowid INTEGER PRIMARY KEY,
+    commit_hash TEXT,
     additions INTEGER, 
     deletions INTEGER,
     filename INTEGER,
@@ -67,15 +69,21 @@ for index, row in df[current_row:].iterrows():
         print('Skipping row {} as it has already been processed'.format(index))
         continue
 
-    commit = row['commit']
+    hash = row['commit']
     repo = row['repo']
     author = row['author']
     date = row['date']
     message = row['message']
 
+    # Store the commit in the database
+    cur.execute("""
+    INSERT INTO commits (commit_hash, author, date, message, repo)
+    VALUES (?, ?, ?, ?, ?)
+    """, (hash, author, date, message, repo))
+
     # Get the diff
     repo = g.get_repo(repo)
-    commit = repo.get_commit(commit)
+    commit = repo.get_commit(hash)
 
     for file in commit.files:
         additions = file.additions
@@ -85,9 +93,9 @@ for index, row in df[current_row:].iterrows():
 
         # store this data in a new table in your database
         cur.execute("""
-        INSERT INTO diff (additions, deletions, filename, patch)
-        VALUES (?, ?, ?, ?)
-        """, (additions, deletions, filename, patch))
+        INSERT INTO diff (commit_hash, additions, deletions, filename, patch)
+        VALUES (?, ?, ?, ?, ?)
+        """, (hash, additions, deletions, filename, patch))
 
     # Save the current row to a pickle file
     with open('data/current_row.pickle', 'wb') as f:
