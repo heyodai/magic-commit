@@ -1,33 +1,54 @@
 # Magic Commit! ✨
 
-The goal of Magic Commit is to automatically write your commit messages for you. It's a simple tool that will help you write better commit messages.
+`magic-commit` is a command-line tool for writing your commit messages. It pings OpenAI's GPT-3 API to generate commit messages based on your commit history.
 
-## Table of Contents
-* [Usage](#usage)
-* [Development](#development)
-    * [Pre-requisites](#pre-requisites)
-    * [Poetry Commands](#poetry-commands)
-* [Contributing](#contributing)
+## Installation
+
+On Mac:
+```bash
+brew install magic-commit
+```
+
+## Setup
+
+You'll need to set up an OpenAI account and get an API key. You can do that on [OpenAI's website](https://platform.openai.com/account/api-keys).
+
+Once you have a key, add it to `magic-commit` like so:
+```bash
+magic-commit -k <your-key-here>
+```
 
 ## Usage
 
-¯\\_(ツ)_/¯
-## Development
+Running `magic-commit` is straightforward:
+```bash
+magic-commit # will run in your current directory
+>>> [your commit message] # automatically copied to your clipboard
+```
 
-### Pre-requisites
-- Python 3.6+
-- Poetry
+To specify a directory:
+```bash
+magic-commit -d <path-to-git-repo>
+```
 
-### Poetry Commands
-- `poetry install` - Install dependencies
-- `poetry run git-diff` - Acquire git diffs via API
-- `poetry run upload` - Upload contents of `/data` to AWS
-- `poetry run download` - Download contents of `/data` from AWS
+For help:
+```bash
+magic-commit -h # or --help
+```
 
-### Data Sources
+## Specifying a model
 
-- `full.csv` - [Full dataset](https://www.kaggle.com/datasets/dhruvildave/github-commit-messages-dataset) of commit messages
+To change the model for this run:
+```bash
+magic-commit -m <model-name> 
+```
 
-## Contributing
+To change the model globally:
+```bash
+magic-commit --set_model <model-name>
+```
 
-¯\\_(ツ)_/¯
+For models, note that:
+- You need to specify an [OpenAI GPT model](https://platform.openai.com/docs/models).
+    - e.g. `gpt-3.5-turbo-0301`, or `gpt-4`
+- Your account needs to have access to the model you specify.

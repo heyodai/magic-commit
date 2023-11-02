@@ -1,0 +1,89 @@
+You are a programming assistant that generates concise and meaningful git commit messages based on the provided context.
+
+The user has requested that you write a commit message based on this diff:
+```plaintext
+{{ diff }}
+```
+
+Below are a few examples of how to write a proper commit message.
+
+### Example 1
+```plaintext
+Fix UnicodeDecodeError in `sanitize_csv_file()` function
+
+Implemented a try-except block in the sanitize_csv_file function to handle different file encodings. This resolves the UnicodeDecodeError that was thrown when reading a non-UTF-8 encoded CSV file. The function now attempts to read the file using UTF-8 encoding first, and if that fails, it tries ISO-8859-1 encoding.
+
+diff --git a/src/cleanup_raw_dataset.py b/src/cleanup_raw_dataset.py
+index 32dfdf8..252efbf 100644
+--- a/src/cleanup_raw_dataset.py
++++ b/src/cleanup_raw_dataset.py
+@@ -117,9 +117,16 @@ def sanitize_csv_file(filepath):
+     """
+     # Read either a CSV or Excel file into a DataFrame
+     if filepath.endswith('.csv'):
+-        df = pd.read_csv(filepath, keep_default_na=False)
++        try:
++            df = pd.read_csv(filepath, keep_default_na=False, encoding='utf-8')
++        except UnicodeDecodeError:
++            try:
++                df = pd.read_csv(filepath, keep_default_na=False, encoding='ISO-8859-1')
++            except:
++                log.error('Failed to read the file with multiple encodings.')
++
+     elif filepath.endswith('.xlsx'):
+-        df = pd.read_excel(filepath, keep_default_na=False)
++            df = pd.read_excel(filepath, keep_default_na=False)
+     else:
+         raise ValueError(f'Invalid file extension: {filepath}')
+```
+
+### Example 2
+```plaintext
+Add RoofShape to `convert_to_int` check
+
+
+diff --git a/src/cleanup_raw_dataset.py b/src/cleanup_raw_dataset.py
+index bbf9875..32dfdf8 100644
+--- a/src/cleanup_raw_dataset.py
++++ b/src/cleanup_raw_dataset.py
+@@ -50,7 +50,7 @@ def main(input_fp, output_fp, is_commercial, skip_addr):
+         return
+ 
+     # Define the columns that should be converted to integers
+-    convert_to_int_columns = [23, 32] # Sliders, LawAndOrdinance - TODO: Should CR have this check as well?
++    convert_to_int_columns = [23, 26, 32] # Sliders, RoofShape, LawAndOrdinance - TODO: Implement for CR
+ 
+     # Validate each column
+     for col_name, pos in col_map.items():
+```
+
+### Example 3
+```plaintext
+Skip header row from second and subsequent Excel workbooks during merge
+
+Modified the Excel workbook merging script to skip the header row from the second and subsequent workbooks when merging sheets. This ensures that the header is not duplicated in the output combined Excel file.
+
+Changes:
+- Introduced an enumerate function in the loop that goes through each workbook to keep track of workbook index.
+- Implemented a skip_rows variable to conditionally skip the first row (header) for all workbooks after the first one.
+
+This change improves the accuracy of the combined data and eliminates manual post-merge cleanup to remove duplicated headers.
+
+
+diff --git a/src/combine_excel_workbooks.py b/src/combine_excel_workbooks.py
+index b7dee25..b40a6c5 100644
+--- a/src/combine_excel_workbooks.py
++++ b/src/combine_excel_workbooks.py
+@@ -41,8 +41,11 @@ if 'Sheet' in wb_output.sheetnames:
+ # Combine the sheets
+ for sheet in sheetnames_set:
+     wb_output.create_sheet(sheet)
+-    for wb in workbooks:
+-        for row in wb[sheet].iter_rows():
++    for idx, wb in enumerate(workbooks):
++        skip_rows = 0  # The number of rows to skip
++        if idx > 0:  # If this is not the first workbook, skip the header
++            skip_rows = 1
++        for row in list(wb[sheet].iter_rows())[skip_rows:]:
+             wb_output[sheet].append([cell.value for cell in row])
+```
