@@ -15,7 +15,7 @@ You'll need to set up an OpenAI account and get an API key. You can do that on [
 
 Once you have a key, add it to `magic-commit` like so:
 ```bash
-magic-commit key <your-key-here>
+magic-commit -k <your-key-here>
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ magic-commit -m <model-name>
 
 To change the model globally:
 ```bash
-magic-commit model <model-name>
+magic-commit --set_model <model-name>
 ```
 
 For models, note that:
