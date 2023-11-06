@@ -2,7 +2,7 @@ import argparse
 
 import dagwood
 
-from .magic_commit import run_magic_commit, set_api_key
+from .magic_commit import run_magic_commit, set_api_key, get_api_key, get_model, set_model
 
 
 def main() -> None:
@@ -34,7 +34,10 @@ def main() -> None:
         set_api_key(args.key, log)
 
     else:
-        run_magic_commit(args, log)
+        directory = args.directory or "."  # Default to the current directory
+        key = get_api_key()
+        model = get_model()
+        run_magic_commit(directory=directory, api_key=key, model=model)
 
 
 if __name__ == "__main__":
