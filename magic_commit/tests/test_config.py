@@ -10,19 +10,19 @@
 #     def test_get_api_key(self, mock_config_parser):
 #         # Setup the mock to return a predefined API key
 #         mock_config_parser.return_value.get.return_value = "test_api_key"
-        
+
 #         # Call the function to test
 #         api_key = get_api_key()
-        
+
 #         # Check if the correct API key is returned
 #         self.assertEqual(api_key, "test_api_key")
-        
+
 #     @patch('.configparser.ConfigParser')
 #     @patch('.open', new_callable=mock_open)
 #     def test_set_api_key(self, mock_file, mock_config_parser):
 #         # Attempt to set an API key and ensure the file write is called
 #         set_api_key("new_test_api_key")
-        
+
 #         # Ensure that the config file write method was called
 #         mock_file.assert_called_with(CONFIG_FILE, "w")
 #         mock_config_parser.return_value.write.assert_called()
@@ -34,10 +34,10 @@
 #         # Setup to simulate no API key set
 #         mock_path_exists.return_value = False
 #         mock_config_parser.return_value.get.side_effect = KeyError("no key")
-        
+
 #         # Call the function
 #         api_key = get_api_key()
-        
+
 #         # Check if the function handles the absence of an API key correctly
 #         self.assertIsNone(api_key)
 

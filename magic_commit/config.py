@@ -8,6 +8,7 @@ CONFIG_FILE = os.path.expanduser("~/.magic_commit_config")
 def set_model(model_name: str, log: Logger) -> None:
     pass
 
+
 def get_model() -> str:
     """
     Get the stored preferred OpenAI GPT model.
@@ -22,6 +23,7 @@ def get_model() -> str:
 
     # TODO: Add verification that the model is a valid option
     return "gpt-3.5-turbo"
+
 
 def get_api_key() -> str:
     """
@@ -64,5 +66,5 @@ def set_api_key(api_key) -> None:
             config.write(configfile)
     except OSError:
         raise OSError("Could not write to config file")
-    
+
     return True
