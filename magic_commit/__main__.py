@@ -1,19 +1,41 @@
 import argparse
-from .magic_commit import run_magic_commit
 
-def main():
-    parser = argparse.ArgumentParser(description='Generate commit messages with OpenAI’s GPT.')
-    parser.add_argument('-d', '--directory', help='Specify the git repository directory')
-    parser.add_argument('-m', '--model', help='Specify the OpenAI GPT model')
-    parser.add_argument('-k', '--key', metavar='API_KEY', help='Set your OpenAI API key')
-    parser.add_argument('--set-model', metavar='MODEL_NAME', help='Set the default OpenAI GPT model')
+import dagwood
+
+from .magic_commit import run_magic_commit, set_api_key
+
+
+def main() -> None:
+    """
+    Entry point for the `magic-commit` command.
+    """
+    # Set up logging
+    log = dagwood.assemble(format="")
+
+    # Get the command line arguments
+    parser = argparse.ArgumentParser(
+        description="Generate commit messages with OpenAI’s GPT."
+    )
+
+    parser.add_argument(
+        "-d", "--directory", help="Specify the git repository directory"
+    )
+    parser.add_argument("-m", "--model", help="Specify the OpenAI GPT model")
+    parser.add_argument(
+        "-k", "--key", metavar="API_KEY", help="Set your OpenAI API key"
+    )
+    parser.add_argument(
+        "--set-model", metavar="MODEL_NAME", help="Set the default OpenAI GPT model"
+    )
+
+    # Decide what to do based on the arguments
     args = parser.parse_args()
+    if args.key:
+        set_api_key(args.key, log)
 
-    # TODO: Add flag to pass a GitHub ticket
-    # TODO: Allow user to specify their own commit messages for few-shot learning
-    # TODO: Add type hinting and documenting comments
+    else:
+        run_magic_commit(args, log)
 
-    run_magic_commit(args)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
