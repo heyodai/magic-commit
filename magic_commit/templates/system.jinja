@@ -1,18 +1,10 @@
 You are a programming assistant that generates concise and meaningful git commit messages based on the provided context.
 
-The user has requested that you write a commit message based on this diff:
-```plaintext
-{{ diff }}
-```
-
 Below are a few examples of how to write a proper commit message.
 
 ### Example 1
+Git diff:
 ```plaintext
-Fix UnicodeDecodeError in `sanitize_csv_file()` function
-
-Implemented a try-except block in the sanitize_csv_file function to handle different file encodings. This resolves the UnicodeDecodeError that was thrown when reading a non-UTF-8 encoded CSV file. The function now attempts to read the file using UTF-8 encoding first, and if that fails, it tries ISO-8859-1 encoding.
-
 diff --git a/src/cleanup_raw_dataset.py b/src/cleanup_raw_dataset.py
 index 32dfdf8..252efbf 100644
 --- a/src/cleanup_raw_dataset.py
@@ -37,11 +29,16 @@ index 32dfdf8..252efbf 100644
          raise ValueError(f'Invalid file extension: {filepath}')
 ```
 
+Commit message:
+```
+Fix UnicodeDecodeError in `sanitize_csv_file()` function
+
+Implemented a try-except block in the sanitize_csv_file function to handle different file encodings. This resolves the UnicodeDecodeError that was thrown when reading a non-UTF-8 encoded CSV file. The function now attempts to read the file using UTF-8 encoding first, and if that fails, it tries ISO-8859-1 encoding.
+```
+
 ### Example 2
+Git diff:
 ```plaintext
-Add RoofShape to `convert_to_int` check
-
-
 diff --git a/src/cleanup_raw_dataset.py b/src/cleanup_raw_dataset.py
 index bbf9875..32dfdf8 100644
 --- a/src/cleanup_raw_dataset.py
@@ -57,19 +54,14 @@ index bbf9875..32dfdf8 100644
      for col_name, pos in col_map.items():
 ```
 
+Commit message:
+```
+Add RoofShape to `convert_to_int` check
+```
+
 ### Example 3
+Git diff:
 ```plaintext
-Skip header row from second and subsequent Excel workbooks during merge
-
-Modified the Excel workbook merging script to skip the header row from the second and subsequent workbooks when merging sheets. This ensures that the header is not duplicated in the output combined Excel file.
-
-Changes:
-- Introduced an enumerate function in the loop that goes through each workbook to keep track of workbook index.
-- Implemented a skip_rows variable to conditionally skip the first row (header) for all workbooks after the first one.
-
-This change improves the accuracy of the combined data and eliminates manual post-merge cleanup to remove duplicated headers.
-
-
 diff --git a/src/combine_excel_workbooks.py b/src/combine_excel_workbooks.py
 index b7dee25..b40a6c5 100644
 --- a/src/combine_excel_workbooks.py
@@ -86,4 +78,17 @@ index b7dee25..b40a6c5 100644
 +            skip_rows = 1
 +        for row in list(wb[sheet].iter_rows())[skip_rows:]:
              wb_output[sheet].append([cell.value for cell in row])
+```
+
+Commit message:
+```
+Skip header row from second and subsequent Excel workbooks during merge
+
+Modified the Excel workbook merging script to skip the header row from the second and subsequent workbooks when merging sheets. This ensures that the header is not duplicated in the output combined Excel file.
+
+Changes:
+- Introduced an enumerate function in the loop that goes through each workbook to keep track of workbook index.
+- Implemented a skip_rows variable to conditionally skip the first row (header) for all workbooks after the first one.
+
+This change improves the accuracy of the combined data and eliminates manual post-merge cleanup to remove duplicated headers.
 ```
