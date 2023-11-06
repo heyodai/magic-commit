@@ -1,19 +1,41 @@
 import argparse
-from .magic_commit import run_magic_commit
+
+import dagwood
+
+from .magic_commit import run_magic_commit, set_api_key
+
 
 def main() -> None:
     """
     Entry point for the `magic-commit` command.
     """
-    parser = argparse.ArgumentParser(description='Generate commit messages with OpenAI’s GPT.')
+    # Set up logging
+    log = dagwood.assemble(format="")
 
-    parser.add_argument('-d', '--directory', help='Specify the git repository directory')
-    parser.add_argument('-m', '--model', help='Specify the OpenAI GPT model')
-    parser.add_argument('-k', '--key', metavar='API_KEY', help='Set your OpenAI API key')
-    parser.add_argument('--set-model', metavar='MODEL_NAME', help='Set the default OpenAI GPT model')
+    # Get the command line arguments
+    parser = argparse.ArgumentParser(
+        description="Generate commit messages with OpenAI’s GPT."
+    )
 
+    parser.add_argument(
+        "-d", "--directory", help="Specify the git repository directory"
+    )
+    parser.add_argument("-m", "--model", help="Specify the OpenAI GPT model")
+    parser.add_argument(
+        "-k", "--key", metavar="API_KEY", help="Set your OpenAI API key"
+    )
+    parser.add_argument(
+        "--set-model", metavar="MODEL_NAME", help="Set the default OpenAI GPT model"
+    )
+
+    # Decide what to do based on the arguments
     args = parser.parse_args()
-    run_magic_commit(args)
+    if args.key:
+        set_api_key(args.key, log)
 
-if __name__ == '__main__':
+    else:
+        run_magic_commit(args, log)
+
+
+if __name__ == "__main__":
     main()
