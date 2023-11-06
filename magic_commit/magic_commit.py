@@ -1,5 +1,6 @@
 import os
 import subprocess
+from logging import Logger  # Just so the linter doesn't complain
 
 import openai
 from jinja2 import Environment, PackageLoader
