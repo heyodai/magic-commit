@@ -110,7 +110,7 @@ def get_commit_messages(directory: str) -> str:
     return result.stdout
 
 
-def generate_commit_message(diff: str, api_key: str, model: str) -> str:
+def generate_commit_message(diff: str, api_key: str, model: str, verbosity: int) -> str:
     """
     Generate a commit message.
 
@@ -122,6 +122,8 @@ def generate_commit_message(diff: str, api_key: str, model: str) -> str:
         The OpenAI API key.
     model : str
         The OpenAI GPT model to use.
+    verbosity : int
+        The verbosity level to use.
 
     Returns
     -------
@@ -138,8 +140,12 @@ def generate_commit_message(diff: str, api_key: str, model: str) -> str:
         raise OpenAIKeyError("OpenAI API key not set.")
 
     # Generate the prompt
-    system_msg = render_template("", "system")
+    verbosity = render_template(verbosity, "verbosity")
+    # examples = render_template("", f"examples_verb_{verbosity}")
+
+    system_msg = render_template(verbosity, "system")
     user_msg = render_template(diff, "user")
+    # print(system_msg)
 
     # Generate the commit message
     messages = [
@@ -158,7 +164,7 @@ def render_template(message: str, template_name: str) -> str:
     Parameters
     ----------
     message : str
-        The commit message to render.
+        The message to render.
     template_name : str
         The name of the template to use.
 
@@ -170,16 +176,20 @@ def render_template(message: str, template_name: str) -> str:
     # TODO: Write unit tests for this function
 
     # Render any escape sequences in the message
-    message.encode().decode("unicode_escape")
+    try:
+        message.encode().decode("unicode_escape")
+    except AttributeError:
+        # Just continue if the message is not a string
+        pass
 
     # Render and return the template
     jinja = Environment(loader=PackageLoader("magic_commit", "templates")).get_template(
         f"{template_name}.jinja"
     )
-    return jinja.render(diff=message)
+    return jinja.render(message=message)
 
 
-def run_magic_commit(directory: str, api_key: str, model: str) -> str:
+def run_magic_commit(directory: str, api_key: str, model: str, verbosity: int) -> str:
     """
     Generate a commit message and return it.
 
@@ -191,6 +201,8 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
         The OpenAI API key.
     model : str
         The OpenAI GPT model to use.
+    verbosity : int
+        The verbosity level to use.
 
     Returns
     -------
@@ -198,5 +210,5 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
         The generated commit message.
     """
     diff = run_git_diff(directory)
-    commit_message = generate_commit_message(diff, api_key, model)
+    commit_message = generate_commit_message(diff, api_key, model, verbosity)
     return commit_message

@@ -34,9 +34,18 @@ def main() -> None:
     parser.add_argument(
         "--set-model", metavar="MODEL_NAME", help="Set the default OpenAI GPT model"
     )
+    parser.add_argument(
+        '-v', '--verbosity', action='store', help="Control the output verbosity", default=3, type=int
+    )
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
+    
+    allowed_verbosity = [1, 2, 3, 4, 5]
+    if args.verbosity not in allowed_verbosity:
+        log.info(f"Verbosity must be one of {allowed_verbosity}")
+        exit(1)
+
     if args.key:
         set_api_key(args.key, log)
 
@@ -51,7 +60,7 @@ def main() -> None:
 
         key = get_api_key()
         model = get_model()
-        results = run_magic_commit(directory=directory, api_key=key, model=model)
+        results = run_magic_commit(directory=directory, api_key=key, model=model, verbosity=args.verbosity)
 
         print(results)
 

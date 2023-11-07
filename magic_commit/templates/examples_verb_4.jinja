@@ -1,9 +1,3 @@
-You are a programming assistant that generates concise and meaningful git commit messages based on the provided context.
-
-{{ message }}
-
-Below are a few examples of how to write a proper commit message.
-
 ### Example 1
 Git diff:
 ```plaintext
@@ -33,9 +27,9 @@ index 32dfdf8..252efbf 100644
 
 Commit message:
 ```
-Fix UnicodeDecodeError in `sanitize_csv_file()` function
+Refactor `sanitize_csv_file()` for Enhanced Encoding Support
 
-Implemented a try-except block in the sanitize_csv_file function to handle different file encodings. This resolves the UnicodeDecodeError that was thrown when reading a non-UTF-8 encoded CSV file. The function now attempts to read the file using UTF-8 encoding first, and if that fails, it tries ISO-8859-1 encoding.
+In an effort to augment the robustness of the `sanitize_csv_file()` function within our data sanitization pipeline, a refactor has been conducted to incorporate a sequential encoding detection mechanism. Initially, the function now attempts to interpret CSV files using UTF-8 encoding; should this endeavor fail due to a UnicodeDecodeError, a fallback to ISO-8859-1 encoding is engaged. This modification not only mitigates the risk of encountering character encoding issues during the file reading process but also enhances the function's versatility in accommodating files of varied origins. Furthermore, the inclusion of a comprehensive logging strategy ensures that any failures in reading the file with the specified encodings are dutifully recorded, thereby facilitating easier debugging and maintenance.
 ```
 
 ### Example 2
@@ -58,7 +52,9 @@ index bbf9875..32dfdf8 100644
 
 Commit message:
 ```
-Add RoofShape to `convert_to_int` check
+Extend Integer Conversion Check to Include `RoofShape` in Data Sanitization Process
+
+In the latest commit, the data sanitization script's capability has been expanded through the inclusion of the 'RoofShape' column in the integer conversion validation process. This update is part of an ongoing effort to refine our data integrity checks and is a precursor to a broader implementation intended for the Commercial Residential (CR) dataset. By incorporating 'RoofShape' into the array of columns designated for conversion to integers, we ensure a more comprehensive data cleaning operation, thereby bolstering the accuracy of our analytical outcomes. This step marks a significant stride towards our objective of achieving a uniform and error-resistant data framework.
 ```
 
 ### Example 3
@@ -84,13 +80,7 @@ index b7dee25..b40a6c5 100644
 
 Commit message:
 ```
-Skip header row from second and subsequent Excel workbooks during merge
+Optimize Excel Workbook Merge to Exclude Repeated Headers
 
-Modified the Excel workbook merging script to skip the header row from the second and subsequent workbooks when merging sheets. This ensures that the header is not duplicated in the output combined Excel file.
-
-Changes:
-- Introduced an enumerate function in the loop that goes through each workbook to keep track of workbook index.
-- Implemented a skip_rows variable to conditionally skip the first row (header) for all workbooks after the first one.
-
-This change improves the accuracy of the combined data and eliminates manual post-merge cleanup to remove duplicated headers.
+The workbook merging script has been meticulously revised to introduce a novel functionality: the exclusion of repetitive header rows from subsequent Excel files in the consolidation process. This optimization was achieved by incorporating an iterative enumeration over the collection of workbooks, paired with a conditional check that identifies and skips the header row after the initial workbook has been processed. The adjustment guarantees that the final merged workbook is devoid of redundant header information, thereby enhancing data integrity and reducing the necessity for post-processing rectification. The change signifies a critical improvement in the script's operational efficiency and output quality.
 ```
