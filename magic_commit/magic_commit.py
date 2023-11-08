@@ -1,6 +1,10 @@
 import os
 import subprocess
 from logging import Logger  # Just so the linter doesn't complain
+import threading
+import itertools
+import time
+import sys
 
 import openai
 from jinja2 import Environment, PackageLoader
@@ -148,6 +152,7 @@ def generate_commit_message(diff: str, api_key: str, model: str) -> str:
     ]
     openai.api_key = api_key
     response = openai.ChatCompletion.create(model=model, messages=messages)
+
     return response.choices[0].message.content.strip()
 
 
@@ -178,6 +183,23 @@ def render_template(message: str, template_name: str) -> str:
     )
     return jinja.render(diff=message)
 
+def animate_loading(stop_event: threading.Event) -> None:
+    """
+    Display a simple loading animation with dots until a stop_event is set.
+
+    Parameters
+    ----------
+    stop_event : threading.Event
+        An event to signal when the animation should stop.
+    """
+    for c in itertools.cycle(['.  ', '.. ', '...']):
+        if stop_event.is_set():
+            sys.stdout.write('\r       \r')  # Clear the line
+            sys.stdout.flush()
+            break
+        sys.stdout.write('\rLoading' + c)
+        sys.stdout.flush()
+        time.sleep(0.5)
 
 def run_magic_commit(directory: str, api_key: str, model: str) -> str:
     """
@@ -197,6 +219,17 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
     str
         The generated commit message.
     """
-    diff = run_git_diff(directory)
-    commit_message = generate_commit_message(diff, api_key, model)
+    # Create a threading event to signal when to stop the loading animation
+    stop_loading = threading.Event()
+    loading_thread = threading.Thread(target=animate_loading, args=(stop_loading,))
+    loading_thread.start()
+
+    try:
+        diff = run_git_diff(directory)
+        commit_message = generate_commit_message(diff, api_key, model)
+    finally:
+        # Ensure the loading animation stops
+        stop_loading.set()
+        loading_thread.join()
+
     return commit_message
