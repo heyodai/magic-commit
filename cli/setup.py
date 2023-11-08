@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 # Read in the README.md for the long description.
-with open("README.md", "r", encoding="utf-8") as f:
+with open("../README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(

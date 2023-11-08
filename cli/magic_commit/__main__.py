@@ -47,6 +47,9 @@ def main() -> None:
         type=int,
     )
     parser.add_argument("-s", "--start", help="Provide the start of the commit message")
+    parser.add_argument(
+        "--no-load", action="store_true", help="Do not show loading message"
+    )
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
@@ -74,9 +77,15 @@ def main() -> None:
         model = get_model()
         ticket = f"Closes #{args.ticket}" if args.ticket else ""
         start = args.start if args.start else ""
+        show_loading_message = False if args.no_load else True
 
         results = run_magic_commit(
-            directory=directory, api_key=key, model=model, ticket=ticket, start=start
+            directory=directory,
+            api_key=key,
+            model=model,
+            ticket=ticket,
+            start=start,
+            show_loading_message=show_loading_message,
         )
 
         print(results)
