@@ -2,13 +2,9 @@ from unittest import mock
 
 import pytest
 
-from ..magic_commit import (
-    GitRepositoryError,
-    OpenAIKeyError,
-    generate_commit_message,
-    get_commit_messages,
-    run_magic_commit,
-)
+from ..magic_commit import (GitRepositoryError, OpenAIKeyError,
+                            generate_commit_message, get_commit_messages,
+                            run_magic_commit)
 
 
 def test_is_not_git_repository():

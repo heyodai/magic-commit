@@ -52,3 +52,14 @@ For models, note that:
 - You need to specify an [OpenAI GPT model](https://platform.openai.com/docs/models).
     - e.g. `gpt-3.5-turbo-0301`, or `gpt-4`
 - Your account needs to have access to the model you specify.
+
+## Contributing
+
+Feel free to open an issue or submit a pull request.
+
+To publish a new version to PyPI:
+```bash
+pip install twine # if you don't have it already
+python setup.py sdist bdist_wheel # build the package
+twine upload dist/* # upload to PyPI
+```

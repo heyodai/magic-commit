@@ -4,6 +4,7 @@ from logging import Logger  # Just so the linter doesn't complain
 
 CONFIG_FILE = os.path.expanduser("~/.magic_commit_config")
 
+
 def set_model(model_name: str, log: Logger) -> None:
     pass
 
