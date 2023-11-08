@@ -1,5 +1,6 @@
 import argparse
 import os
+import pyperclip
 
 import dagwood
 
@@ -34,6 +35,9 @@ def main() -> None:
     parser.add_argument(
         "--set-model", metavar="MODEL_NAME", help="Set the default OpenAI GPT model"
     )
+    parser.add_argument(
+        "--no-copy", action="store_true", help="Do not copy the commit message to the clipboard"
+    )
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
@@ -53,6 +57,7 @@ def main() -> None:
         model = get_model()
         results = run_magic_commit(directory=directory, api_key=key, model=model)
 
+        pyperclip.copy(results)
         print(results)
 
 
