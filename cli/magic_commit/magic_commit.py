@@ -269,7 +269,12 @@ def animate_loading(stop_event: threading.Event) -> None:
 
 
 def run_magic_commit(
-    directory: str, start: str, ticket: str, api_key: str, model: str
+    directory: str,
+    start: str,
+    ticket: str,
+    api_key: str,
+    model: str,
+    show_loading_message: bool,
 ) -> str:
     """
     Generate a commit message and return it.
@@ -286,6 +291,8 @@ def run_magic_commit(
         The OpenAI API key.
     model : str
         The OpenAI GPT model to use.
+    show_loading_message : bool
+        Whether or not to show the loading animation.
 
     Returns
     -------
@@ -293,9 +300,10 @@ def run_magic_commit(
         The generated commit message.
     """
     # Create a threading event to signal when to stop the loading animation
-    stop_loading = threading.Event()
-    loading_thread = threading.Thread(target=animate_loading, args=(stop_loading,))
-    loading_thread.start()
+    if show_loading_message:
+        stop_loading = threading.Event()
+        loading_thread = threading.Thread(target=animate_loading, args=(stop_loading,))
+        loading_thread.start()
 
     try:
         diff = run_git_diff(directory)
@@ -304,7 +312,8 @@ def run_magic_commit(
         commit_message = generate_commit_message(diff, start, ticket, api_key, model)
     finally:
         # Ensure the loading animation stops
-        stop_loading.set()
-        loading_thread.join()
+        if show_loading_message:
+            stop_loading.set()
+            loading_thread.join()
 
     return commit_message
