@@ -39,7 +39,13 @@ def main() -> None:
     # Decide what to do based on the arguments
     args = parser.parse_args()
     if args.key:
-        set_api_key(args.key, log)
+        try:
+            set_api_key(args.key)
+            print("🔑 OpenAI API key set!")
+        except OSError as e:
+            print("Unable to set OpenAI API key.")
+        except Exception as e:
+            print(e)
 
     else:
         directory = args.directory or "."  # Default to the current directory
