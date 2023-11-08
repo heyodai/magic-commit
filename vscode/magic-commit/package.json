@@ -2,20 +2,28 @@
   "name": "magic-commit",
   "displayName": "magic-commit",
   "description": "Generate commit messages with AI",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.84.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:git"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [{
-      "command": "magic-commit.helloWorld",
-      "title": "Hello World"
-    }]
+      "command": "extension.magicCommit",
+      "title": "✨ 🍰"
+    }],
+    "menus": {
+      "scm/title": [{
+        "command": "extension.magicCommit",
+        "group": "navigation"
+      }]
+    }
   },
   "scripts": {
     "lint": "eslint .",
