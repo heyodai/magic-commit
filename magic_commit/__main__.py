@@ -57,8 +57,9 @@ def main() -> None:
         model = get_model()
         results = run_magic_commit(directory=directory, api_key=key, model=model)
 
-        pyperclip.copy(results)
         print(results)
+        if not args.no_copy:
+            pyperclip.copy(results)
 
 
 if __name__ == "__main__":
