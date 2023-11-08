@@ -83,6 +83,26 @@ def run_git_log(directory: str) -> subprocess.CompletedProcess:
         text=True,
     )
 
+def check_git_status(directory: str) -> bool:
+    """
+    Check if there are changes staged for commit in the Git repository.
+
+    Parameters
+    ----------
+    directory : str
+        The path to the Git repository.
+
+    Returns
+    -------
+    bool
+        True if there are changes staged for commit, False otherwise.
+    """
+    result = subprocess.run(
+        ["git", "status"], cwd=directory, capture_output=True, text=True
+    )
+    return "no changes added to commit" not in result.stdout
+
+
 
 def get_commit_messages(directory: str) -> str:
     """
@@ -226,6 +246,8 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
 
     try:
         diff = run_git_diff(directory)
+        if not check_git_status(directory): # Check if there are staged changes
+            return "⛔ Warning: No staged changes detected. Please stage some changes before running magic-commit."
         commit_message = generate_commit_message(diff, api_key, model)
     finally:
         # Ensure the loading animation stops
