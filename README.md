@@ -4,9 +4,9 @@
 
 ## Installation
 
-On Mac:
+All platforms via [PyPI](https://pypi.org/project/magic-commit/)
 ```bash
-brew install magic-commit
+pip install magic-commit
 ```
 
 ## Setup
@@ -59,7 +59,7 @@ Feel free to open an issue or submit a pull request.
 
 To publish a new version to PyPI:
 ```bash
-pip install twine # if you don't have it already
+pip install twine wheel # if you don't have it already
 python setup.py sdist bdist_wheel # build the package
 twine upload dist/* # upload to PyPI
 ```
