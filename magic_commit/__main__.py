@@ -4,8 +4,13 @@ import os
 import dagwood
 import pyperclip
 
-from .magic_commit import (get_api_key, get_model, run_magic_commit,
-                           set_api_key, set_model)
+from .magic_commit import (
+    get_api_key,
+    get_model,
+    run_magic_commit,
+    set_api_key,
+    set_model,
+)
 
 
 def main() -> None:
@@ -35,10 +40,18 @@ def main() -> None:
         action="store_true",
         help="Do not copy the commit message to the clipboard",
     )
+    parser.add_argument(
+        "-t",
+        "--ticket",
+        help="Request that the provided GitHub issue be linked in the commit message",
+        type=int,
+    )
+    parser.add_argument("-s", "--start", help="Provide the start of the commit message")
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
     if args.key:
+        # Set the OpenAI API key
         try:
             set_api_key(args.key)
             print("🔑 OpenAI API key set!")
@@ -48,6 +61,7 @@ def main() -> None:
             print(e)
 
     else:
+        # Generate a commit message
         directory = args.directory or "."  # Default to the current directory
         directory = os.path.expanduser(
             directory
@@ -58,7 +72,12 @@ def main() -> None:
 
         key = get_api_key()
         model = get_model()
-        results = run_magic_commit(directory=directory, api_key=key, model=model)
+        ticket = f"Closes #{args.ticket}" if args.ticket else ""
+        start = args.start if args.start else ""
+
+        results = run_magic_commit(
+            directory=directory, api_key=key, model=model, ticket=ticket, start=start
+        )
 
         print(results)
         if not args.no_copy:

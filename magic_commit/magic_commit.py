@@ -83,6 +83,7 @@ def run_git_log(directory: str) -> subprocess.CompletedProcess:
         text=True,
     )
 
+
 def check_git_status(directory: str) -> bool:
     """
     Check if there are changes staged for commit in the Git repository.
@@ -101,7 +102,6 @@ def check_git_status(directory: str) -> bool:
         ["git", "status"], cwd=directory, capture_output=True, text=True
     )
     return "no changes added to commit" not in result.stdout
-
 
 
 def get_commit_messages(directory: str) -> str:
@@ -134,7 +134,9 @@ def get_commit_messages(directory: str) -> str:
     return result.stdout
 
 
-def generate_commit_message(diff: str, api_key: str, model: str) -> str:
+def generate_commit_message(
+    diff: str, start: str, ticket: str, api_key: str, model: str
+) -> str:
     """
     Generate a commit message.
 
@@ -142,6 +144,10 @@ def generate_commit_message(diff: str, api_key: str, model: str) -> str:
     ----------
     diff : str
         The git diff to use.
+    start : str
+        The start of the commit message.
+    ticket : str
+        The GitHub issue to link in the commit message.
     api_key : str
         The OpenAI API key.
     model : str
@@ -172,8 +178,19 @@ def generate_commit_message(diff: str, api_key: str, model: str) -> str:
     ]
     openai.api_key = api_key
     response = openai.ChatCompletion.create(model=model, messages=messages)
+    response = response.choices[0].message.content.strip()
 
-    return response.choices[0].message.content.strip()
+    # Strip the first line of response
+    # Assign it to start if it is empty
+    # Otherwise, remove the first line from the response
+    if start:
+        response = response.split("\n", 1)[1]
+    else:
+        start = response.split("\n", 1)[0]
+        response = response.split("\n", 1)[1]
+
+    # Render and return the template
+    return render_final_template(start, response, ticket).strip()
 
 
 def render_template(message: str, template_name: str) -> str:
@@ -203,6 +220,35 @@ def render_template(message: str, template_name: str) -> str:
     )
     return jinja.render(diff=message)
 
+
+def render_final_template(start: str, generated_message: str, ticket: str) -> str:
+    """
+    Render the final commit message template.
+
+    Parameters
+    ----------
+    start : str
+        The start of the commit message.
+    generated_message : str
+        The generated commit message.
+    ticket : str
+        The GitHub issue to link in the commit message.
+
+    Returns
+    -------
+    str
+        The rendered commit message.
+    """
+    # Render any escape sequences in the message
+    generated_message.encode().decode("unicode_escape")
+
+    # Render and return the template
+    jinja = Environment(loader=PackageLoader("magic_commit", "templates")).get_template(
+        "final.jinja"
+    )
+    return jinja.render(start=start, generated_message=generated_message, ticket=ticket)
+
+
 def animate_loading(stop_event: threading.Event) -> None:
     """
     Display a simple loading animation with dots until a stop_event is set.
@@ -212,16 +258,19 @@ def animate_loading(stop_event: threading.Event) -> None:
     stop_event : threading.Event
         An event to signal when the animation should stop.
     """
-    for c in itertools.cycle(['.  ', '.. ', '...']):
+    for c in itertools.cycle([".  ", ".. ", "..."]):
         if stop_event.is_set():
-            sys.stdout.write('\r       \r')  # Clear the line
+            sys.stdout.write("\r       \r")  # Clear the line
             sys.stdout.flush()
             break
-        sys.stdout.write('\rLoading' + c)
+        sys.stdout.write("\rLoading" + c)
         sys.stdout.flush()
         time.sleep(0.5)
 
-def run_magic_commit(directory: str, api_key: str, model: str) -> str:
+
+def run_magic_commit(
+    directory: str, start: str, ticket: str, api_key: str, model: str
+) -> str:
     """
     Generate a commit message and return it.
 
@@ -229,6 +278,10 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
     ----------
     directory : str
         The path to the Git repository.
+    start : str
+        The start of the commit message.
+    ticket : str
+        The GitHub issue to link in the commit message.
     api_key : str
         The OpenAI API key.
     model : str
@@ -246,9 +299,9 @@ def run_magic_commit(directory: str, api_key: str, model: str) -> str:
 
     try:
         diff = run_git_diff(directory)
-        if not check_git_status(directory): # Check if there are staged changes
+        if not check_git_status(directory):  # Check if there are staged changes
             return "⛔ Warning: No staged changes detected. Please stage some changes before running magic-commit."
-        commit_message = generate_commit_message(diff, api_key, model)
+        commit_message = generate_commit_message(diff, start, ticket, api_key, model)
     finally:
         # Ensure the loading animation stops
         stop_loading.set()
