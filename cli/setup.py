@@ -6,7 +6,7 @@ with open("../README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="magic-commit",
-    version="0.5.1",
+    version="0.6.1",
     packages=find_packages(),
     include_package_data=True,  # This line is needed to include non-code files
     package_data={
