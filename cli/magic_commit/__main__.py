@@ -41,15 +41,16 @@ def main() -> None:
         help="Do not copy the commit message to the clipboard",
     )
     parser.add_argument(
+        "--no-load", action="store_true", help="Do not show loading message"
+    )
+    parser.add_argument(
         "-t",
         "--ticket",
         help="Request that the provided GitHub issue be linked in the commit message",
         type=int,
     )
     parser.add_argument("-s", "--start", help="Provide the start of the commit message")
-    parser.add_argument(
-        "--no-load", action="store_true", help="Do not show loading message"
-    )
+    parser.add_argument("--llama", help="Pass a localhost Llama2 server as a replacement for OpenAI API")
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
@@ -86,6 +87,7 @@ def main() -> None:
             ticket=ticket,
             start=start,
             show_loading_message=show_loading_message,
+            llama2_url=args.llama,
         )
 
         print(results)

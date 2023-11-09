@@ -5,6 +5,7 @@ import threading
 import itertools
 import time
 import sys
+import requests
 
 import openai
 from jinja2 import Environment, PackageLoader
@@ -21,7 +22,12 @@ class GitRepositoryError(Exception):
 class OpenAIKeyError(Exception):
     """Custom exception for OpenAI API key errors."""
 
+
+
+class Llama2ServerError(Exception):
+    """Custom exception for Llama2 server errors."""
     pass
+
 
 
 def is_git_repository(directory: str) -> bool:
@@ -135,7 +141,7 @@ def get_commit_messages(directory: str) -> str:
 
 
 def generate_commit_message(
-    diff: str, start: str, ticket: str, api_key: str, model: str
+    diff: str, start: str, ticket: str, api_key: str, model: str, llama2_url: str = None
 ) -> str:
     """
     Generate a commit message.
@@ -152,6 +158,8 @@ def generate_commit_message(
         The OpenAI API key.
     model : str
         The OpenAI GPT model to use.
+    llama2_url: str
+        (Optional) The URL of the Llama2 server to use.
 
     Returns
     -------
@@ -176,9 +184,18 @@ def generate_commit_message(
         {"role": "system", "content": system_msg},
         {"role": "user", "content": user_msg},
     ]
-    openai.api_key = api_key
-    response = openai.ChatCompletion.create(model=model, messages=messages)
-    response = response.choices[0].message.content.strip()
+
+    # Determine which service to use
+    if llama2_url:
+        # Call the Llama2 server
+        response = call_llama2_server(llama2_url, messages)
+        print(response)
+        response = response['choices'][0]['message']['content'].strip()
+    else:
+        # Use OpenAI's service
+        openai.api_key = api_key
+        response = openai.ChatCompletion.create(model=model, messages=messages)
+        response = response.choices[0].message.content.strip()
 
     # Strip the first line of response
     # Assign it to start if it is empty
@@ -191,6 +208,36 @@ def generate_commit_message(
 
     # Render and return the template
     return render_final_template(start, response, ticket).strip()
+
+
+
+def call_llama2_server(url: str, messages: list) -> dict:
+    """
+    Call the Llama2 server.
+
+    Parameters
+    ----------
+    url : str
+        The URL of the Llama2 server.
+    messages : list
+        The messages to send to the server.
+
+    Returns
+    -------
+    dict
+        The response from the server.
+
+    Raises
+    ------
+    Llama2ServerError
+        If an error occurs while connecting to the server.
+    """
+    try:
+        response = requests.post(url, json={"messages": messages})
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise Llama2ServerError(f"An error occurred while connecting to the Llama2 server: {e}")
 
 
 def render_template(message: str, template_name: str) -> str:
@@ -275,6 +322,7 @@ def run_magic_commit(
     api_key: str,
     model: str,
     show_loading_message: bool,
+    llama2_url: str = None
 ) -> str:
     """
     Generate a commit message and return it.
@@ -293,6 +341,8 @@ def run_magic_commit(
         The OpenAI GPT model to use.
     show_loading_message : bool
         Whether or not to show the loading animation.
+    llama2_url: str
+        (Optional) The URL of the Llama2 server to use.
 
     Returns
     -------
@@ -309,7 +359,7 @@ def run_magic_commit(
         diff = run_git_diff(directory)
         if not check_git_status(directory):  # Check if there are staged changes
             return "⛔ Warning: No staged changes detected. Please stage some changes before running magic-commit."
-        commit_message = generate_commit_message(diff, start, ticket, api_key, model)
+        commit_message = generate_commit_message(diff, start, ticket, api_key, model, llama2_url)
     finally:
         # Ensure the loading animation stops
         if show_loading_message:
