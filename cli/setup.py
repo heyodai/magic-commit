@@ -1,12 +1,14 @@
 from setuptools import find_packages, setup
 
+from magic_commit.version import __version__
+
 # Read in the README.md for the long description.
 with open("../README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
     name="magic-commit",
-    version="0.6.2",
+    version=__version__,
     packages=find_packages(),
     include_package_data=True,  # This line is needed to include non-code files
     package_data={

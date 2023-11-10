@@ -4,13 +4,9 @@ import os
 import dagwood
 import pyperclip
 
-from .magic_commit import (
-    get_api_key,
-    get_model,
-    run_magic_commit,
-    set_api_key,
-    set_model,
-)
+from .magic_commit import (get_api_key, get_model, run_magic_commit,
+                           set_api_key, set_model)
+from .version import __version__
 
 
 def main() -> None:
@@ -24,7 +20,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Generate commit messages with OpenAI’s GPT."
     )
-
+    parser.add_argument("-v", "--version", action="version", version=f"{__version__}")
     parser.add_argument(
         "-d", "--directory", help="Specify the git repository directory"
     )
@@ -50,7 +46,9 @@ def main() -> None:
         type=int,
     )
     parser.add_argument("-s", "--start", help="Provide the start of the commit message")
-    parser.add_argument("--llama", help="Pass a localhost Llama2 server as a replacement for OpenAI API")
+    parser.add_argument(
+        "--llama", help="Pass a localhost Llama2 server as a replacement for OpenAI API"
+    )
 
     # Decide what to do based on the arguments
     args = parser.parse_args()
