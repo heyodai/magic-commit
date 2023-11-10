@@ -1,13 +1,13 @@
+import itertools
 import os
 import subprocess
-from logging import Logger  # Just so the linter doesn't complain
-import threading
-import itertools
-import time
 import sys
-import requests
+import threading
+import time
+from logging import Logger  # Just so the linter doesn't complain
 
 import openai
+import requests
 from jinja2 import Environment, PackageLoader
 
 from .config import get_api_key, get_model, set_api_key, set_model
